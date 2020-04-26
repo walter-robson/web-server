@@ -86,12 +86,21 @@ bool parse_options(int argc, char *argv[], ServerMode *mode) {
  * Parses command line options and starts appropriate server
  **/
 int main(int argc, char *argv[]) {
-    ServerMode mode;
+    ServerMode *mode;
 
     /* Parse command line options */
+    bool parsed = parse_options(argc, argv, mode);
 
+    if (!parsed){
+      fprintf(stderr, "unable to parse command line: %s\n", strerror(errno));
+    }
     /* Listen to server socket */
-
+    int server_fd = socket_listen(Port);
+    if(server_fd < 0){
+      perror("socket_listen");
+      return EXIT_FAILURE;
+    }
+    Request * r = accept_request(server_fd);
     /* Determine real RootPath */
     log("Listening on port %s", Port);
     debug("RootPath        = %s", RootPath);
@@ -100,7 +109,7 @@ int main(int argc, char *argv[]) {
     debug("ConcurrencyMode = %s", mode == SINGLE ? "Single" : "Forking");
 
     /* Start either forking or single HTTP server */
-    return status;
+    return EXIT_SUCCESS;
 }
 
 /* vim: set expandtab sts=4 sw=4 ts=8 ft=c: */

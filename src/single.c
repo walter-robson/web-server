@@ -19,9 +19,11 @@ int single_server(int sfd) {
     	/* Accept request */
       Request *request = accept_request(sfd);
       if(! request){
-        log("unable to accept request: %s", strerr(errno));
+        log("unable to accept request: %s", strerror(errno));
         continue;
       }
+
+
 	/* Handle request */
       handle_request(request);
 	/* Free request */

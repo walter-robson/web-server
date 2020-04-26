@@ -30,25 +30,41 @@ int parse_request_headers(Request *r);
 Request * accept_request(int sfd) {
     Request *r;
     struct sockaddr raddr;
-    socklen_t rlen;
+    socklen_t rlen = sizeof(struct sockaddr);
 
     /* Allocate request struct (zeroed) */
-    r = calloc(1, sizeof( struct Request));
+    r = calloc(1, sizeof( Request));
     if(!r){
-      fprintf(stderr, "Error with request allocation: %s\n", stderr(errno));
+      debug("unable to allocate request: %s\n", strerror(errno));
       goto fail;
     }
     /* Accept a client */
-    int client_fd = accpt
+    r->fd = accept(sfd, &raddr, &rlen);
+    if(r->fd < 0){
+      debug("unable to accept: %s\n", strerror(errno));
+      goto fail;
+    }
     /* Lookup client information */
-
+    int status = getnameinfo(&raddr, rlen, r->host, sizeof(r->host),
+        r->port, sizeof(r->port), NI_NUMERICHOST | NI_NUMERICSERV);
+    if(status < 0){
+      debug("unable to get name info: %s\n", gai_strerror(status));
+      goto fail;
+    }
     /* Open socket stream */
+    r->stream = fdopen(r->fd, "w+");
+    if(!r->stream){
+      debug("unable to fdopen: %s\n", strerror(errno));
+      goto fail;
+    }
+
 
     log("Accepted request from %s:%s", r->host, r->port);
     return r;
 
 fail:
     /* Deallocate request struct */
+    free_request(r);
     return NULL;
 }
 
@@ -70,12 +86,28 @@ void free_request(Request *r) {
     }
 
     /* Close socket or fd */
-
+    if(r->stream){
+      fclose(r->stream);
+    }
+    else{
+      close(r->fd);
+    }
     /* Free allocated strings */
-
+    free(r->method);
+    free(r->uri);
+    free(r->path);
+    free(r->query);
     /* Free headers */
-
+    struct header *header;
+    while(r->headers){
+      header = r->headers;
+      r->headers = r->headers->next;
+      free(header->name);
+      free(header->data);
+      free(header);
+    }
     /* Free request */
+    free(r);
 }
 
 /**
@@ -89,8 +121,15 @@ void free_request(Request *r) {
  **/
 int parse_request(Request *r) {
     /* Parse HTTP Request Method */
-
+    if(parse_request_method(r) < 0){
+      fprintf(stderr, "unable to parse request method.\n");
+      return -1;
+    };
     /* Parse HTTP Requet Headers*/
+    if(parse_request_headers(r) < 0){
+      fprintf(stderr, "unable to parse request headers.\n");
+      return -1;
+    }
     return 0;
 }
 
@@ -118,9 +157,16 @@ int parse_request_method(Request *r) {
     char *query;
 
     /* Read line from socket */
-
+    if(!fgets(buffer, BUFSIZ, r->stream)){
+      return HTTP_STATUS_BAD_REQUEST;
+    }
     /* Parse method and uri */
+    method = strtok(buffer, WHITESPACE);
+    uri = strtok(NULL, WHITESPACE );
 
+    if(!method || !uri){
+      return HTTP_STATUS_BAD_REQUEST;
+    }
     /* Parse query from uri */
 
     /* Record method, uri, and query in request struct */
@@ -168,6 +214,16 @@ int parse_request_headers(Request *r) {
     char *data;
 
     /* Parse headers from socket */
+    while(fgets(buffer, BUFSIZ, r->stream) && (strlen(buffer) > 2)){
+      debug("header: %s\n", buffer);
+    }
+
+    //'this might need to go in handler.c'
+    fprintf(r->stream, "HTTP/1.0 200 OK \r\n");
+    fprintf(r->stream, "Content-Type: text/html\r\n");
+    fprintf(r->stream, "\r\n");
+
+    fprintf(r->stream, "<h1> TEST </h1>");
 
 #ifndef NDEBUG
     for (Header *header = r->headers; header; header = header->next) {

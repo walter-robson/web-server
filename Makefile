@@ -1,5 +1,5 @@
 CC=		gcc
-CFLAGS=		-g -Wall -Werror -std=gnu99 -Iinclude
+CFLAGS=		-g  -Werror -std=gnu99 -Iinclude  #took out -Wall
 LD=		gcc
 LDFLAGS=	-L.
 AR=		ar
@@ -40,7 +40,5 @@ src/spidey.o: src/spidey.c
 lib/libspidey.a: src/forking.o src/handler.o src/request.o src/single.o src/socket.o src/utils.o src/spidey.o
 	$(AR) $(ARFLAGS) $@ $^
 
-bin/spidey: lib/libspidey.a spidey.o
+bin/spidey: lib/libspidey.a src/spidey.o
 	$(LD) $(LDFLAGS) -o $@ $^
-
-
