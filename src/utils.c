@@ -39,11 +39,25 @@ char * determine_mimetype(const char *path) {
     FILE *fs = NULL;
 
     /* Find file extension */
-
+    ext = strrchr(path,".");
     /* Open MimeTypesPath file */
-
+    fs = fopen(path,"w");
+    char *method = strtok(buffer,WHITESPACE);
+    char *resource = strtok(NULL, WHITESPACE);
     /* Scan file for matching file extensions */
-    return NULL;
+    while (fgets(resource, BUFSIZ, fs)){
+        while(ext==WHITESPACE){
+            skip_whitespace(ext);
+        }
+        if(streq(resource,ext))
+            mimetype = NULL; //whatever this is
+    }
+    if (ext==NULL || mimetype==NULL){
+        return DefaultMimeType;
+    }
+    fclose(fs);
+    return mimetype;
+    //return allocated string that must be freed
 }
 
 /**
@@ -63,7 +77,12 @@ char * determine_mimetype(const char *path) {
  * string must later be free'd.
  **/
 char * determine_request_path(const char *uri) {
-    return NULL;
+    char buffer[BUFSIZ];
+    //buffer is absolute path
+    if strcmp(buffer,NULL)
+        //allocate heap string
+    char *abspath=realpath(uri,buffer);
+    return abspath;
 }
 
 /**
@@ -83,7 +102,11 @@ const char * http_status_string(Status status) {
         "418 I'm A Teapot",
     };
 
-    return NULL;
+    if (status < sizeof(StatusStrings)/sizeof(char *)){
+        return StatusStrings[status];
+    } else {
+        return NULL;
+    }
 }
 
 /**
@@ -93,6 +116,7 @@ const char * http_status_string(Status status) {
  * @return  Point to first whitespace character in s.
  **/
 char * skip_nonwhitespace(char *s) {
+    s=s+1;
     return s;
 }
 
@@ -103,6 +127,7 @@ char * skip_nonwhitespace(char *s) {
  * @return  Point to first non-whitespace character in s.
  **/
 char * skip_whitespace(char *s) {
+    s=s+1;
     return s;
 }
 
