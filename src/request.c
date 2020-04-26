@@ -218,13 +218,7 @@ int parse_request_headers(Request *r) {
       debug("header: %s\n", buffer);
     }
 
-    //'this might need to go in handler.c'
-    fprintf(r->stream, "HTTP/1.0 200 OK \r\n");
-    fprintf(r->stream, "Content-Type: text/html\r\n");
-    fprintf(r->stream, "\r\n");
-
-    fprintf(r->stream, "<h1> TEST </h1>");
-
+    
 #ifndef NDEBUG
     for (Header *header = r->headers; header; header = header->next) {
     	debug("HTTP HEADER %s = %s", header->name, header->data);
