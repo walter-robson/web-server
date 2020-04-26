@@ -31,11 +31,15 @@ Status  handle_request(Request *r) {
     Status result;
 
     /* Parse request */
-    parse_request(r);
-    if(!parse_request(r)){
+    if(parse_request(r)<0){
         debug("Unable to parse request: %s\n",strerror(errno));
         result = handle_error(r, result);
     }
+    fprintf(client_stream, "HTTP/1.0 200 OK\r\n");
+    fprintf(client_stream, "Content-Type: text/html\r\n");
+    fprintf(client_stream, "\r\n");
+    fprintf(client_stream, "<h1> TEST </h1>");
+
     r->path = determine_request_path(/* const char * */)
     /* Determine request path */
     debug("HTTP REQUEST PATH: %s", r->path);
@@ -56,6 +60,10 @@ Status  handle_request(Request *r) {
         result = handle_error(r, result);
     }
     log("HTTP REQUEST STATUS: %s", http_status_string(result));
+
+    fprintf(client_stream, "HTTP/1.0 200 OK\r\n");
+    fprintf(client_stream, "Content-Type: text/html\r\n");
+    fprintf(client_stream, "\r\n");
 
     return result;
 }
