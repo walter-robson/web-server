@@ -33,9 +33,13 @@ Request * accept_request(int sfd) {
     socklen_t rlen;
 
     /* Allocate request struct (zeroed) */
-
+    r = calloc(1, sizeof( struct Request));
+    if(!r){
+      fprintf(stderr, "Error with request allocation: %s\n", stderr(errno));
+      goto fail;
+    }
     /* Accept a client */
-
+    int client_fd = accpt
     /* Lookup client information */
 
     /* Open socket stream */
