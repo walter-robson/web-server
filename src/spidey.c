@@ -109,6 +109,9 @@ int main(int argc, char *argv[]) {
     debug("ConcurrencyMode = %s", mode == SINGLE ? "Single" : "Forking");
 
     /* Start either forking or single HTTP server */
+    if(single_server(Port) < 0){
+      fprintf(stderr, "unable to start single server: %s\n", strerror(errno));
+    }
     return EXIT_SUCCESS;
 }
 
