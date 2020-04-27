@@ -39,25 +39,34 @@ char * determine_mimetype(const char *path) {
     FILE *fs = NULL;
 
     /* Find file extension */
-    ext = strchr(path,'.');
+    ext = strrchr(path,'.');
     ext++;
+    debug("This is ext: %s", ext);
     /* Open MimeTypesPath file */
-    fs = fopen(path,"r");
+    fs = fopen(MimeTypesPath,"r");
     /* Scan file for matching file extensions */
     if (!fgets(buffer,BUFSIZ,fs)){
         return NULL;
     }
+    log("Got to while loop");
     while (fgets(buffer, BUFSIZ, fs)){
         mimetype = strtok(skip_whitespace(buffer),WHITESPACE);
+        if (mimetype==NULL)
+            continue;
         token = strtok(NULL,WHITESPACE);
-        if (streq(token,ext)){
-            fclose(fs);
-            return strdup(mimetype);
+        while(token){
+            if (streq(token,ext)){
+                fclose(fs);
+                return strdup(mimetype);
+            }
+            token = strtok(NULL,WHITESPACE);
         }
     }
     if (ext==NULL || mimetype==NULL){
+        fclose(fs);
         return DefaultMimeType;
     }
+    fclose(fs);
     return NULL;
 }
 
@@ -82,16 +91,20 @@ char * determine_request_path(const char *uri) {
     char buffer1[BUFSIZ];
     debug("This is the root path: %s",RootPath);
     debug("This is the uri: %s", uri);
-    sprintf(buffer1, "/%s/%s", RootPath, uri);
+    snprintf(buffer1,BUFSIZ,"%s/%s/", RootPath, uri);
     char buffer2[BUFSIZ];
+    debug("Buffer 1: %s",buffer1);
+    debug("Buffer 2: %s",buffer2);
     //buffer is absolute path
-    debug("This is the realpath: %s",realpath(buffer1,buffer2));
-    if (strcmp(RootPath,realpath(buffer1,buffer2))!=0){
-        log("no seg fault, but bad");
+    if(realpath(buffer1,buffer2)==NULL){
+        debug("Real Path Error: %s", strerror(errno));
+    }
+    debug("This is the realpath: %s",buffer2);
+    if (strncmp(buffer2,RootPath,strlen(RootPath))==0){
+        debug("Strncmp result: %d", strncmp(buffer2,RootPath,strlen(RootPath)));
         return NULL;
     }
-    log("no seg fault and no bad");
-        //allocate heap string
+    //allocate heap string
     return strdup(buffer2);
 }
 

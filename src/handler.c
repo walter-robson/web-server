@@ -34,11 +34,8 @@ Status  handle_request(Request *r) {
     if(parse_request(r)<0){
         debug("Unable to parse request: %s\n",strerror(errno));
         result = handle_error(r, result);
+        return result;
     }
-    fprintf(r->stream, "HTTP/1.0 200 OK\r\n");
-    fprintf(r->stream, "Content-Type: text/html\r\n");
-    fprintf(r->stream, "\r\n");
-    fprintf(r->stream, "<h1> TEST </h1>");
     
     r->path = determine_request_path(r->uri);
 
@@ -48,13 +45,16 @@ Status  handle_request(Request *r) {
     // Dispatch to appropriate request handler type based on file type 
     struct stat s;
     stat(r->path, &s);
-    if(s.st_mode){
+    if (S_ISREG(s.st_mode)){
+        debug("Entered file request");
         result = handle_file_request(r);
     }
-    else if (s.st_mode ){
+    else if (S_ISDIR(s.st_mode)){
+        debug("Entered browse request");
         result = handle_browse_request(r);
     }
-    else if (s.st_mode ){
+    else if (access(r->path,X_OK)){
+        debug("Entered cgi request");
         result = handle_cgi_request(r);
     }
     else{
@@ -81,7 +81,13 @@ Status  handle_browse_request(Request *r) {
     int n;
 
     /* Open a directory for reading or scanning */
+    debug("Entering browse request");
     DIR * tempDir = opendir(r->path);
+    n = scandir("./www", &entries, 0, alphasort);
+    if (n < 0){
+        debug("Unable to scan directory: %s\n", strerror(errno));
+        return;
+    }
 
     /* Write HTTP Header with OK Status and text/html Content-Type */
     fprintf(r->stream, "HTTP/1.0 200 OK\r\n");
@@ -89,10 +95,20 @@ Status  handle_browse_request(Request *r) {
     fprintf(r->stream, "\r\n");
 
     /* For each entry in directory, emit HTML list item */
- //   while (scandir(tempDir, entries)){
-    //    <ul> html tag
- //   }
- //   closedir(tempDir);
+    fprintf(r->stream, "<ol>\n");
+    for (int i = 0; i < n; i++){
+        if (strcmp(entries[i]->d_name,".")==0){
+            continue;
+        }
+        if (strchr(entries[i]->d_name,"git")){
+            continue;
+        }
+        fprintf(r->stream, "<li>%s</li>\n", entries[i]->d_name); 
+        free(entries[i]);  
+    }
+    free(entries);
+    fprintf(r->stream, "<ol>\n");
+
     /* Return OK */
     return HTTP_STATUS_OK;
 }
@@ -113,24 +129,24 @@ Status  handle_file_request(Request *r) {
     char buffer[BUFSIZ];
     char *mimetype = NULL;
     size_t nread; 
-    
-    if (!fgets(buffer, BUFSIZ, fs)){
-        return -1;
-    }
 
     /* Open file for reading */
     fs = fopen(r->path,"r");
     if (!fs){
         return HTTP_STATUS_INTERNAL_SERVER_ERROR;
     }
+    if (!fgets(buffer, BUFSIZ, fs)){
+        return -1;
+    }
 
+    log("Get to mimetype");
     /* Determine mimetype */
     mimetype = determine_mimetype(r->path);
     debug("This is the mimetype: %s\n", mimetype);
 
     /* Write HTTP Headers with OK status and determined Content-Type */
     fprintf(r->stream, "HTTP/1.0 200 OK\r\n");
-    fprintf(r->stream, "Content-Type: text/%s\r\n",mimetype);
+    fprintf(r->stream, "Content-Type: %s\r\n",mimetype);
     fprintf(r->stream, "\r\n");
 
     /* Read from file and write to socket in chunks */
@@ -199,6 +215,7 @@ Status  handle_error(Request *r, Status status) {
     fprintf(r->stream, "\r\n");
     /* Write HTML Description of Error*/
     
+
     /* Return specified status */
     return status;
 }
