@@ -124,6 +124,7 @@ int parse_request(Request *r) {
       fprintf(stderr, "unable to parse request method.\n");
       return -1;
     };
+    log("Parse methods succesfully");
     /* Parse HTTP Requet Headers*/
     if(parse_request_headers(r) < 0){
       fprintf(stderr, "unable to parse request headers.\n");
@@ -163,14 +164,29 @@ int parse_request_method(Request *r) {
     /* Parse method and uri */
     method = strtok(buffer, WHITESPACE);
     uri = strtok(NULL, WHITESPACE );
+    debug("URI tests: %s\n", uri);
 
     if(!method || !uri){
       fprintf(stderr,"Bad request %s\n",strerror(errno));
-
       return HTTP_STATUS_BAD_REQUEST;
     }
-    /* Parse query from uri */
     r->method = strdup(method);
+
+    /* Parse query from uri */
+    debug("Buffer: %s\n",buffer);
+    char *temp = strchr(uri,'?');
+    if (temp){
+        uri = strtok(skip_whitespace(++uri),temp);
+        query = strtok(NULL,temp);
+        debug("New URI: %s", uri);
+        debug("Query: %s", query);
+        r->uri = strdup(uri);
+        r->query = strdup(query);
+    }
+    else{
+        goto fail;
+    }
+
     /* Record method, uri, and query in request struct */
     debug("HTTP METHOD: %s", r->method);
     debug("HTTP URI:    %s", r->uri);
@@ -213,11 +229,30 @@ int parse_request_headers(Request *r) {
     Header *curr = NULL;
     char buffer[BUFSIZ];
     char *name;
-    char *data;
-
     /* Parse headers from socket */
     while(fgets(buffer, BUFSIZ, r->stream) && (strlen(buffer) > 2)){
-      debug("header: %s\n", buffer);
+        chomp(buffer);
+        log("Enters while loop successfully");
+        char*temp = strchr(buffer,":");
+        //occasionally hits NDEBUG and goes on forever
+        if(!temp){
+            debug("No temp\n");
+            goto fail;
+        }
+        curr = calloc(1,sizeof(Header));
+        curr->data = skip_whitespace(++temp);
+        debug("header: %s\n", buffer);
+        name = strtok(buffer,":");
+        if(!name){
+            debug("No name\n");
+            goto fail;
+        }
+        curr->name = strdup(name);
+        debug("data: %s\n", curr->data);
+        debug("name: %s\n", curr->name);
+        curr->next=r->headers;
+        r->headers=curr;
+        free(curr);
     }
 
     

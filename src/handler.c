@@ -39,27 +39,28 @@ Status  handle_request(Request *r) {
     fprintf(r->stream, "Content-Type: text/html\r\n");
     fprintf(r->stream, "\r\n");
     fprintf(r->stream, "<h1> TEST </h1>");
+    
+    r->path = determine_request_path(r->uri);
 
-/*    r->path = determine_request_path(r->uri);
-    * Determine request path *
+    // Determine request path
     debug("HTTP REQUEST PATH: %s", r->path);
 
-    * Dispatch to appropriate request handler type based on file type *
+    // Dispatch to appropriate request handler type based on file type 
     struct stat s;
     stat(r->path, &s);
-    if(s.st_mode * is a file *){
+    if(s.st_mode){
         result = handle_file_request(r);
     }
-    else if (s.st_mode * browse *){
+    else if (s.st_mode ){
         result = handle_browse_request(r);
     }
-    else if (s.st_mode * cgi script *){
-        result = handle_cgi_script;
+    else if (s.st_mode ){
+        result = handle_cgi_request(r);
     }
     else{
         result = handle_error(r, result);
     }
-    log("HTTP REQUEST STATUS: %s", http_status_string(result)); */
+    log("HTTP REQUEST STATUS: %s", http_status_string(result));
 
     return result;
 }
@@ -125,6 +126,7 @@ Status  handle_file_request(Request *r) {
 
     /* Determine mimetype */
     mimetype = determine_mimetype(r->path);
+    debug("This is the mimetype: %s\n", mimetype);
 
     /* Write HTTP Headers with OK status and determined Content-Type */
     fprintf(r->stream, "HTTP/1.0 200 OK\r\n");
@@ -195,7 +197,6 @@ Status  handle_error(Request *r, Status status) {
     fprintf(r->stream, "HTTP/1.0 %s\r\n",status_string);
     fprintf(r->stream, "Content-Type: text/plain\r\n");
     fprintf(r->stream, "\r\n");
-
     /* Write HTML Description of Error*/
     
     /* Return specified status */

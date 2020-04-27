@@ -33,31 +33,32 @@
  **/
 char * determine_mimetype(const char *path) {
     char *ext;
-    char *mimetype = NULL;
+    char *mimetype;
     char *token;
     char buffer[BUFSIZ];
     FILE *fs = NULL;
 
     /* Find file extension */
- //   ext = strrchr(path,".");
+    ext = strchr(path,'.');
+    ext++;
     /* Open MimeTypesPath file */
- /*   fs = fopen(path,"w");
-    char *method = strtok(buffer,WHITESPACE);
-    char *resource = strtok(NULL, WHITESPACE); */
+    fs = fopen(path,"r");
     /* Scan file for matching file extensions */
- /*   while (fgets(resource, BUFSIZ, fs)){
-        while(ext==WHITESPACE){
-            skip_whitespace(ext);
+    if (!fgets(buffer,BUFSIZ,fs)){
+        return NULL;
+    }
+    while (fgets(buffer, BUFSIZ, fs)){
+        mimetype = strtok(skip_whitespace(buffer),WHITESPACE);
+        token = strtok(NULL,WHITESPACE);
+        if (streq(token,ext)){
+            fclose(fs);
+            return strdup(mimetype);
         }
-        if(streq(resource,ext))
-            mimetype = NULL; //whatever this is
     }
     if (ext==NULL || mimetype==NULL){
         return DefaultMimeType;
     }
-    fclose(fs); */
-    return mimetype;
-    //return allocated string that must be freed
+    return NULL;
 }
 
 /**
@@ -77,12 +78,21 @@ char * determine_mimetype(const char *path) {
  * string must later be free'd.
  **/
 char * determine_request_path(const char *uri) {
-    char buffer[BUFSIZ];
+    log("entered request path");
+    char buffer1[BUFSIZ];
+    debug("This is the root path: %s",RootPath);
+    debug("This is the uri: %s", uri);
+    sprintf(buffer1, "/%s/%s", RootPath, uri);
+    char buffer2[BUFSIZ];
     //buffer is absolute path
-//    if strcmp(buffer,NULL)
+    debug("This is the realpath: %s",realpath(buffer1,buffer2));
+    if (strcmp(RootPath,realpath(buffer1,buffer2))!=0){
+        log("no seg fault, but bad");
+        return NULL;
+    }
+    log("no seg fault and no bad");
         //allocate heap string
-    char *abspath=realpath(uri,buffer);
-    return abspath;
+    return strdup(buffer2);
 }
 
 /**
@@ -116,7 +126,9 @@ const char * http_status_string(Status status) {
  * @return  Point to first whitespace character in s.
  **/
 char * skip_nonwhitespace(char *s) {
-    s=s+1;
+    while (!isspace(*s)){
+        s=s+1;
+    }
     return s;
 }
 
@@ -127,7 +139,9 @@ char * skip_nonwhitespace(char *s) {
  * @return  Point to first non-whitespace character in s.
  **/
 char * skip_whitespace(char *s) {
-    s=s+1;
+    while (isspace(*s)){
+        s=s+1;
+    }
     return s;
 }
 
