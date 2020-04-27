@@ -29,41 +29,37 @@ Status handle_error(Request *request, Status status);
  **/
 Status  handle_request(Request *r) {
     Status result;
-
+    log("handle request");
     /* Parse request */
     if(parse_request(r)<0){
         debug("Unable to parse request: %s\n",strerror(errno));
         result = handle_error(r, result);
     }
-    fprintf(client_stream, "HTTP/1.0 200 OK\r\n");
-    fprintf(client_stream, "Content-Type: text/html\r\n");
-    fprintf(client_stream, "\r\n");
-    fprintf(client_stream, "<h1> TEST </h1>");
+    fprintf(r->stream, "HTTP/1.0 200 OK\r\n");
+    fprintf(r->stream, "Content-Type: text/html\r\n");
+    fprintf(r->stream, "\r\n");
+    fprintf(r->stream, "<h1> TEST </h1>");
 
-    r->path = determine_request_path(/* const char * */)
-    /* Determine request path */
+/*    r->path = determine_request_path(r->uri);
+    * Determine request path *
     debug("HTTP REQUEST PATH: %s", r->path);
 
-    /* Dispatch to appropriate request handler type based on file type */
+    * Dispatch to appropriate request handler type based on file type *
     struct stat s;
     stat(r->path, &s);
-    if(s.st_mode /* is a file */){
+    if(s.st_mode * is a file *){
         result = handle_file_request(r);
     }
-    else if (s.st_mode /* browse */){
+    else if (s.st_mode * browse *){
         result = handle_browse_request(r);
     }
-    else if (s.st_mode /* cgi script */){
+    else if (s.st_mode * cgi script *){
         result = handle_cgi_script;
     }
     else{
         result = handle_error(r, result);
     }
-    log("HTTP REQUEST STATUS: %s", http_status_string(result));
-
-    fprintf(client_stream, "HTTP/1.0 200 OK\r\n");
-    fprintf(client_stream, "Content-Type: text/html\r\n");
-    fprintf(client_stream, "\r\n");
+    log("HTTP REQUEST STATUS: %s", http_status_string(result)); */
 
     return result;
 }
@@ -87,15 +83,15 @@ Status  handle_browse_request(Request *r) {
     DIR * tempDir = opendir(r->path);
 
     /* Write HTTP Header with OK Status and text/html Content-Type */
-    fprintf(client_stream, "HTTP/1.0 200 OK\r\n");
-    fprintf(client_stream, "Content-Type: text/html\r\n");
-    fprintf(client_stream, "\r\n");
+    fprintf(r->stream, "HTTP/1.0 200 OK\r\n");
+    fprintf(r->stream, "Content-Type: text/html\r\n");
+    fprintf(r->stream, "\r\n");
 
     /* For each entry in directory, emit HTML list item */
-    while (scandir(tempDir, entries)){
-        <ul> html tag
-    }
-    closedir(tempDir);
+ //   while (scandir(tempDir, entries)){
+    //    <ul> html tag
+ //   }
+ //   closedir(tempDir);
     /* Return OK */
     return HTTP_STATUS_OK;
 }
@@ -118,7 +114,7 @@ Status  handle_file_request(Request *r) {
     size_t nread; 
     
     if (!fgets(buffer, BUFSIZ, fs)){
-        return;
+        return -1;
     }
 
     /* Open file for reading */
@@ -131,14 +127,14 @@ Status  handle_file_request(Request *r) {
     mimetype = determine_mimetype(r->path);
 
     /* Write HTTP Headers with OK status and determined Content-Type */
-    fprintf(client_stream, "HTTP/1.0 200 OK\r\n");
-    fprintf(client_stream, "Content-Type: text/%s\r\n",mimetype);
-    fprintf(client_stream, "\r\n");
+    fprintf(r->stream, "HTTP/1.0 200 OK\r\n");
+    fprintf(r->stream, "Content-Type: text/%s\r\n",mimetype);
+    fprintf(r->stream, "\r\n");
 
     /* Read from file and write to socket in chunks */
     nread = fread(buffer,1,BUFSIZ,fs);
     while (nread > 0){
-        fwrite(buffer,1,nread,client_stream);
+        fwrite(buffer,1,nread,r->stream);
         nread = fread(buffer,1,BUFSIZ,fs);
     }
     /* Close file, deallocate mimetype, return OK */
