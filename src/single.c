@@ -25,12 +25,16 @@ int single_server(int sfd) {
 
 
 	/* Handle request */
+      log("before handle request");
       handle_request(request);
+   //       fprintf(stderr,"Unable to handle request %s\n", strerror(errno));
+      log("after handle request");
 	/* Free request */
       free_request(request);
     }
 
     /* Close server socket */
+    close(sfd);
     return EXIT_SUCCESS;
 }
 

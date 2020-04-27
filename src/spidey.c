@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 /* Global Variables */
-char *Port	      = "9898";
+char *Port	      = "9120";
 char *MimeTypesPath   = "/etc/mime.types";
 char *DefaultMimeType = "text/plain";
 char *RootPath	      = "www";
@@ -86,10 +86,10 @@ bool parse_options(int argc, char *argv[], ServerMode *mode) {
  * Parses command line options and starts appropriate server
  **/
 int main(int argc, char *argv[]) {
-    ServerMode *mode;
+    ServerMode mode;
 
     /* Parse command line options */
-    bool parsed = parse_options(argc, argv, mode);
+    bool parsed = parse_options(argc, argv, &mode);
 
     if (!parsed){
       fprintf(stderr, "unable to parse command line: %s\n", strerror(errno));
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
       perror("socket_listen");
       return EXIT_FAILURE;
     }
-    Request * r = accept_request(server_fd);
+  //  Request * r = accept_request(server_fd);
     /* Determine real RootPath */
     log("Listening on port %s", Port);
     debug("RootPath        = %s", RootPath);
@@ -109,9 +109,9 @@ int main(int argc, char *argv[]) {
     debug("ConcurrencyMode = %s", mode == SINGLE ? "Single" : "Forking");
 
     /* Start either forking or single HTTP server */
-    if(single_server(Port) < 0){
-      fprintf(stderr, "unable to start single server: %s\n", strerror(errno));
-    }
+    single_server(server_fd);
+  //    fprintf(stderr, "unable to start single server: %s\n", strerror(errno));
+  //  }
     return EXIT_SUCCESS;
 }
 

@@ -86,17 +86,16 @@ void free_request(Request *r) {
     }
 
     /* Close socket or fd */
-    if(r->stream){
-      fclose(r->stream);
-    }
-    else{
-      close(r->fd);
-    }
+    if(r->stream)
+        fclose(r->stream);
+    else
+        close(r->fd);
+    
     /* Free allocated strings */
     free(r->method);
     free(r->uri);
     free(r->path);
-    free(r->query);
+    free(r->query); 
     /* Free headers */
     struct header *header;
     while(r->headers){
@@ -104,7 +103,7 @@ void free_request(Request *r) {
       r->headers = r->headers->next;
       free(header->name);
       free(header->data);
-      free(header);
+      free(header); 
     }
     /* Free request */
     free(r);
@@ -158,6 +157,7 @@ int parse_request_method(Request *r) {
 
     /* Read line from socket */
     if(!fgets(buffer, BUFSIZ, r->stream)){
+      fprintf(stderr,"Bad request %s\n",strerror(errno));
       return HTTP_STATUS_BAD_REQUEST;
     }
     /* Parse method and uri */
@@ -165,10 +165,12 @@ int parse_request_method(Request *r) {
     uri = strtok(NULL, WHITESPACE );
 
     if(!method || !uri){
+      fprintf(stderr,"Bad request %s\n",strerror(errno));
+
       return HTTP_STATUS_BAD_REQUEST;
     }
     /* Parse query from uri */
-
+    r->method = strdup(method);
     /* Record method, uri, and query in request struct */
     debug("HTTP METHOD: %s", r->method);
     debug("HTTP URI:    %s", r->uri);

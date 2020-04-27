@@ -33,19 +33,19 @@
  **/
 char * determine_mimetype(const char *path) {
     char *ext;
-    char *mimetype;
+    char *mimetype = NULL;
     char *token;
     char buffer[BUFSIZ];
     FILE *fs = NULL;
 
     /* Find file extension */
-    ext = strrchr(path,".");
+ //   ext = strrchr(path,".");
     /* Open MimeTypesPath file */
-    fs = fopen(path,"w");
+ /*   fs = fopen(path,"w");
     char *method = strtok(buffer,WHITESPACE);
-    char *resource = strtok(NULL, WHITESPACE);
+    char *resource = strtok(NULL, WHITESPACE); */
     /* Scan file for matching file extensions */
-    while (fgets(resource, BUFSIZ, fs)){
+ /*   while (fgets(resource, BUFSIZ, fs)){
         while(ext==WHITESPACE){
             skip_whitespace(ext);
         }
@@ -55,7 +55,7 @@ char * determine_mimetype(const char *path) {
     if (ext==NULL || mimetype==NULL){
         return DefaultMimeType;
     }
-    fclose(fs);
+    fclose(fs); */
     return mimetype;
     //return allocated string that must be freed
 }
@@ -79,7 +79,7 @@ char * determine_mimetype(const char *path) {
 char * determine_request_path(const char *uri) {
     char buffer[BUFSIZ];
     //buffer is absolute path
-    if strcmp(buffer,NULL)
+//    if strcmp(buffer,NULL)
         //allocate heap string
     char *abspath=realpath(uri,buffer);
     return abspath;
