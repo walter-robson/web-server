@@ -82,8 +82,7 @@ Status  handle_browse_request(Request *r) {
 
     /* Open a directory for reading or scanning */
     debug("Entering browse request");
-    DIR * tempDir = opendir(r->path);
-    n = scandir("./www", &entries, 0, alphasort);
+    n = scandir(r->path, &entries, 0, alphasort);
     if (n < 0){
         debug("Unable to scan directory: %s\n", strerror(errno));
         return;
@@ -95,19 +94,16 @@ Status  handle_browse_request(Request *r) {
     fprintf(r->stream, "\r\n");
 
     /* For each entry in directory, emit HTML list item */
-    fprintf(r->stream, "<ol>\n");
+    fprintf(r->stream, "<ul>\n");
     for (int i = 0; i < n; i++){
         if (strcmp(entries[i]->d_name,".")==0){
             continue;
         }
-        if (strchr(entries[i]->d_name,"git")){
-            continue;
-        }
-        fprintf(r->stream, "<li>%s</li>\n", entries[i]->d_name); 
+        fprintf(r->stream, "<li><a href=\"%s/%s\">%s</a></li>\n", r->uri, entries[i]->d_name, entries[i]->d_name); 
         free(entries[i]);  
     }
     free(entries);
-    fprintf(r->stream, "<ol>\n");
+    fprintf(r->stream, "<ul>\n");
 
     /* Return OK */
     return HTTP_STATUS_OK;

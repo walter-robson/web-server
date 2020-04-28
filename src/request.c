@@ -164,7 +164,6 @@ int parse_request_method(Request *r) {
     /* Parse method and uri */
     method = strtok(buffer, WHITESPACE);
     uri = strtok(NULL, WHITESPACE );
-    debug("URI tests: %s\n", uri);
 
     if(!method || !uri){
       fprintf(stderr,"Bad request %s\n",strerror(errno));
@@ -173,20 +172,15 @@ int parse_request_method(Request *r) {
     r->method = strdup(method);
 
     /* Parse query from uri */
-    debug("Buffer: %s\n",buffer);
     char *temp = strchr(uri,'?');
-    debug("Temp: %s",temp);
     if (temp){
         uri = strtok(skip_whitespace(++uri),temp);
         query = strtok(NULL,temp);
-        debug("New URI: %s", uri);
-        debug("Query: %s", query);
         r->uri = strdup(uri);
         r->query = strdup(query);
     }
     else{
         uri = skip_whitespace(++uri);
-        debug("URI No Query: %s", uri);
         if(!uri){
             goto fail;
         }
@@ -238,7 +232,6 @@ int parse_request_headers(Request *r) {
     /* Parse headers from socket */
     while(fgets(buffer, BUFSIZ, r->stream) && (strlen(buffer) > 2)){
         chomp(buffer);
-        log("Enters while loop successfully");
         char*temp = strchr(skip_whitespace(buffer),':');
         //occasionally hits NDEBUG and goes on forever
         if(!temp){
@@ -248,15 +241,12 @@ int parse_request_headers(Request *r) {
         *temp=0;
         curr = calloc(1,sizeof(Header));
         curr->data = strdup(skip_whitespace(++temp));
-        debug("header: %s\n", buffer);
         name = skip_whitespace(buffer);
         if(!name){
             debug("No name\n");
             goto fail;
         }
         curr->name = strdup(name);
-        debug("data: %s\n", curr->data);
-        debug("name: %s\n", curr->name);
         curr->next=r->headers;
         r->headers=curr;
     }

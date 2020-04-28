@@ -41,14 +41,12 @@ char * determine_mimetype(const char *path) {
     /* Find file extension */
     ext = strrchr(path,'.');
     ext++;
-    debug("This is ext: %s", ext);
     /* Open MimeTypesPath file */
     fs = fopen(MimeTypesPath,"r");
     /* Scan file for matching file extensions */
     if (!fgets(buffer,BUFSIZ,fs)){
         return NULL;
     }
-    log("Got to while loop");
     while (fgets(buffer, BUFSIZ, fs)){
         mimetype = strtok(skip_whitespace(buffer),WHITESPACE);
         if (mimetype==NULL)
@@ -93,8 +91,6 @@ char * determine_request_path(const char *uri) {
     debug("This is the uri: %s", uri);
     snprintf(buffer1,BUFSIZ,"%s/%s/", RootPath, uri);
     char buffer2[BUFSIZ];
-    debug("Buffer 1: %s",buffer1);
-    debug("Buffer 2: %s",buffer2);
     //buffer is absolute path
     if(realpath(buffer1,buffer2)==NULL){
         debug("Real Path Error: %s", strerror(errno));
