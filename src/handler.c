@@ -131,9 +131,6 @@ Status  handle_file_request(Request *r) {
     if (!fs){
         return HTTP_STATUS_INTERNAL_SERVER_ERROR;
     }
-    if (!fgets(buffer, BUFSIZ, fs)){
-        return -1;
-    }
 
     log("Get to mimetype");
     /* Determine mimetype */
