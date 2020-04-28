@@ -94,7 +94,7 @@ char * determine_request_path(const char *uri) {
     if(uri==NULL){
         return RootPath;
     }
-    snprintf(buffer1,BUFSIZ,"%s/%s/", RootPath, uri);
+    snprintf(buffer1,BUFSIZ,"%s/%s", RootPath, uri);
     char buffer2[BUFSIZ];
     //buffer is absolute path
     if(realpath(buffer1,buffer2)==NULL){
