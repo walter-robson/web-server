@@ -1,5 +1,5 @@
 CC=		gcc
-CFLAGS=		-g  -Werror -std=gnu99 -Iinclude  #took out -Wall
+CFLAGS=		-g  -Wall -std=gnu99 -Iinclude  #took out -Wall
 LD=		gcc
 LDFLAGS=	-L.
 AR=		ar
@@ -19,6 +19,9 @@ clean:
 src/forking.o: src/forking.c
 	$(CC) $(CFLAGS) -c -o $@ $^
 
+src/utils.o: src/utils.c
+	$(CC) $(CFLAGS) -c -o $@ $^
+
 src/handler.o: src/handler.c
 	$(CC) $(CFLAGS) -c -o $@ $^
 
@@ -31,14 +34,11 @@ src/single.o: src/single.c
 src/socket.o: src/socket.c
 	$(CC) $(CFLAGS) -c -o $@ $^
 
-src/utils.o: src/utils.c
-	$(CC) $(CFLAGS) -c -o $@ $^
-
 src/spidey.o: src/spidey.c
 	$(CC) $(CFLAGS) -c -o $@ $^
 
 lib/libspidey.a: src/forking.o src/handler.o src/request.o src/single.o src/socket.o src/utils.o src/spidey.o
 	$(AR) $(ARFLAGS) $@ $^
 
-bin/spidey: lib/libspidey.a src/spidey.o
+bin/spidey: src/spidey.o lib/libspidey.a
 	$(LD) $(LDFLAGS) -o $@ $^
