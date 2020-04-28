@@ -33,11 +33,14 @@ Status  handle_request(Request *r) {
     /* Parse request */
     if(parse_request(r)<0){
         debug("Unable to parse request: %s\n",strerror(errno));
-        result = handle_error(r, result);
-        return result;
+        return HTTP_STATUS_BAD_REQUEST;
     }
 
     r->path = determine_request_path(r->uri);
+    if(r->path<0){
+        debug("Could not determine request: %s\n",strerror(errno));
+        return HTTP_STATUS_BAD_REQUEST;
+    }
 
     // Determine request path
     debug("HTTP REQUEST PATH: %s", r->path);
@@ -48,17 +51,23 @@ Status  handle_request(Request *r) {
     if ((access(r->path,X_OK) == 0) && S_ISREG(s.st_mode)){
         debug("Entered cgi request");
         result = handle_cgi_request(r);
+        if (result)
+            result = handle_error(r,result);
     }
     else if (S_ISDIR(s.st_mode)){
         debug("Entered browse request");
         result = handle_browse_request(r);
+        if (result)
+            result = handle_error(r,result);
     }
     else if (S_ISREG(s.st_mode)){
         debug("Entered file request");
         result = handle_file_request(r);
+        if (result)
+            result = handle_error(r,result);
     }
     else{
-        result = handle_error(r, result);
+        result = HTTP_STATUS_BAD_REQUEST;
     }
     log("HTTP REQUEST STATUS: %s", http_status_string(result));
 
@@ -81,11 +90,14 @@ Status  handle_browse_request(Request *r) {
     int n;
 
     /* Open a directory for reading or scanning */
+    if(r->uri==NULL){
+        return HTTP_STATUS_BAD_REQUEST;
+    }
     debug("Entering browse request");
     n = scandir(r->path, &entries, 0, alphasort);
     if (n < 0){
         debug("Unable to scan directory: %s\n", strerror(errno));
-        return;
+        return HTTP_STATUS_NOT_FOUND;
     }
 
     /* Write HTTP Header with OK Status and text/html Content-Type */
@@ -99,7 +111,13 @@ Status  handle_browse_request(Request *r) {
         if (strcmp(entries[i]->d_name,".")==0){
             continue;
         }
-        fprintf(r->stream, "<li><a href=\"%s/%s\">%s</a></li>\n", r->uri, entries[i]->d_name, entries[i]->d_name);
+        debug("URI during browse request: %s",r->uri);
+        if (strcmp(r->uri,"")==0){
+            fprintf(r->stream, "<li><a href=\"%s/%s\">%s</a></li>\n", "", entries[i]->d_name, entries[i]->d_name);
+        }
+        else{
+            fprintf(r->stream, "<li><a href=\"/%s/%s\">%s</a></li>\n", r->uri, entries[i]->d_name, entries[i]->d_name);
+        }
         free(entries[i]);
     }
     free(entries);
@@ -129,7 +147,7 @@ Status  handle_file_request(Request *r) {
     /* Open file for reading */
     fs = fopen(r->path,"r");
     if (!fs){
-        return HTTP_STATUS_INTERNAL_SERVER_ERROR;
+        goto fail;
     }
 
     log("Get to mimetype");
@@ -141,7 +159,6 @@ Status  handle_file_request(Request *r) {
     fprintf(r->stream, "HTTP/1.0 200 OK\r\n");
     fprintf(r->stream, "Content-Type: %s\r\n",mimetype);
     fprintf(r->stream, "\r\n");
-
     /* Read from file and write to socket in chunks */
     nread = fread(buffer,1,BUFSIZ,fs);
     while (nread > 0){
@@ -150,7 +167,9 @@ Status  handle_file_request(Request *r) {
     }
     /* Close file, deallocate mimetype, return OK */
     fclose(fs);
-    free(mimetype);
+    if(mimetype!=DefaultMimeType){
+        free(mimetype);
+    }
     return HTTP_STATUS_OK;
 
 fail:
@@ -176,14 +195,41 @@ Status  handle_cgi_request(Request *r) {
     FILE *pfs;
     char buffer[BUFSIZ];
     debug("entered handle cgi request!!");
+    Header *header = r->headers;
 
     /* Export CGI environment variables from request:
      * http://en.wikipedia.org/wiki/Common_Gateway_Interface */
 
     /* Export CGI environment variables from request headers */
+    setenv("DOCUMENT_ROOT", RootPath,1);
     setenv("QUERY_STRING", r->query, 1);
+    setenv("REMOTE_ADDR", r->host,1);
+    setenv("REMOTE_PORT", r->port, 1);
+    setenv("REQUEST_METHOD", r->method,1);
+    setenv("REQUEST_URI", r->uri, 1);
+    setenv("SCRIPT_FILENAME", r->path,1);
+    setenv("SERVER_PORT", Port, 1);
+    while (header!=NULL){
+        if (streq(header->name,"Accept"))
+            setenv("HTTP_ACCEPT", header->data,1);
+        if (streq(header->name,"Accept-Encoding"))
+            setenv("HTTP_ACCEPT_ENCODING", header->data, 1);
+        if (streq(header->name,"Accept-Language"))
+            setenv("HTTP_ACCEPT_LANGUAGE", header->data,1);
+        if (streq(header->name,"Connection"))
+            setenv("HTTP_CONNECTION", header->data, 1);
+        if (streq(header->name,"Host"))
+            setenv("HTTP_HOST", header->data,1);
+        if (streq(header->name,"User-Agent"))
+            setenv("HTTP_USER_AGENT", header->data, 1);
+        header = header->next;
+    }
     /* POpen CGI Script */
     pfs = popen(r->path, "r");
+    if(!pfs){
+        pclose(pfs);
+        return HTTP_STATUS_BAD_REQUEST;
+    }
     debug("opened the pfs");
     /* Copy data from popen to socket */
     size_t nread = fread(buffer, 1, BUFSIZ, pfs);
@@ -210,12 +256,15 @@ Status  handle_error(Request *r, Status status) {
 
     /* Write HTTP Header */
     fprintf(r->stream, "HTTP/1.0 %s\r\n",status_string);
-    fprintf(r->stream, "Content-Type: text/plain\r\n");
+    fprintf(r->stream, "Content-Type: text/html\r\n");
     fprintf(r->stream, "\r\n");
     /* Write HTML Description of Error*/
-
+    fprintf(r->stream,"<html><body>");
+    fprintf(r->stream, "<h1>Error: %s</h1>\n",status_string);
+    fprintf(r->stream,"<html><body>");
 
     /* Return specified status */
+    fflush(r->stream);
     return status;
 }
 

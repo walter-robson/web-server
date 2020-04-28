@@ -60,12 +60,9 @@ char * determine_mimetype(const char *path) {
             token = strtok(NULL,WHITESPACE);
         }
     }
-    if (ext==NULL || mimetype==NULL){
-        fclose(fs);
-        return DefaultMimeType;
-    }
+    debug("Hit DefaultMimeType");
     fclose(fs);
-    return NULL;
+    return DefaultMimeType;
 }
 
 /**

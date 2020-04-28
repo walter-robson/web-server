@@ -19,12 +19,28 @@
  **/
 int forking_server(int sfd) {
     /* Accept and handle HTTP request */
+    Status result;
     while (true) {
     	/* Accept request */
-
+        Request *request = accept_request(sfd);
+        if(!request){
+          log("unable to accept request: %s", strerror(errno));
+          continue;
+        }
 	/* Ignore children */
-
+        signal(SIGCHLD,SIG_IGN);
+        pid_t pid = fork();
 	/* Fork off child process to handle request */
+        if (pid == 0){
+            debug("starting child process");
+            result = handle_request(request);
+            free_request(request);
+            exit(result);
+        }
+
+        else{
+            free_request(request);
+        }
     }
 
     /* Close server socket */
