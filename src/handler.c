@@ -47,16 +47,26 @@ Status  handle_request(Request *r) {
 
     // Dispatch to appropriate request handler type based on file type
     struct stat s;
-    stat(r->path, &s);
-    if ((access(r->path,X_OK) == 0) && S_ISREG(s.st_mode)){
-        debug("Entered cgi request");
-        result = handle_cgi_request(r);
+    if((r->path)==NULL){
+        debug("It passed the if");
+        if(!stat(r->path,&s)){
+            result = HTTP_STATUS_BAD_REQUEST;
+        }
+    }
+    else{
+        if(!stat(r->path, &s)){
+            result = HTTP_STATUS_BAD_REQUEST;
+        }
+    }
+    if (S_ISDIR(s.st_mode)){
+        debug("Entered browse request");
+        result = handle_browse_request(r);
         if (result)
             result = handle_error(r,result);
     }
-    else if (S_ISDIR(s.st_mode)){
-        debug("Entered browse request");
-        result = handle_browse_request(r);
+    else if ((access(r->path,X_OK) == 0) && S_ISREG(s.st_mode)){
+        debug("Entered cgi request");
+        result = handle_cgi_request(r);
         if (result)
             result = handle_error(r,result);
     }
@@ -94,7 +104,12 @@ Status  handle_browse_request(Request *r) {
         return HTTP_STATUS_BAD_REQUEST;
     }
     debug("Entering browse request");
-    n = scandir(r->path, &entries, 0, alphasort);
+    if(r->path){
+        n = scandir(r->path, &entries, 0, alphasort);
+    }
+    else{
+        n = scandir(RootPath, &entries, 0, alphasort);
+    }
     if (n < 0){
         debug("Unable to scan directory: %s\n", strerror(errno));
         return HTTP_STATUS_NOT_FOUND;
@@ -201,14 +216,26 @@ Status  handle_cgi_request(Request *r) {
      * http://en.wikipedia.org/wiki/Common_Gateway_Interface */
 
     /* Export CGI environment variables from request headers */
-    setenv("DOCUMENT_ROOT", RootPath,1);
-    setenv("QUERY_STRING", r->query, 1);
-    setenv("REMOTE_ADDR", r->host,1);
-    setenv("REMOTE_PORT", r->port, 1);
-    setenv("REQUEST_METHOD", r->method,1);
-    setenv("REQUEST_URI", r->uri, 1);
-    setenv("SCRIPT_FILENAME", r->path,1);
-    setenv("SERVER_PORT", Port, 1);
+    if(setenv("DOCUMENT_ROOT", RootPath,1))
+        fprintf(stderr,"Can't setenv %s\n",strerror(errno));
+    if(r->query){
+        if(setenv("QUERY_STRING", r->query, 1))
+            fprintf(stderr,"Can't setenv %s\n",strerror(errno));
+    }
+    else
+        setenv("QUERY_STRING","",1);
+    if(setenv("REMOTE_ADDR", r->host,1))
+        fprintf(stderr,"Can't setenv %s\n",strerror(errno));
+    if(setenv("REMOTE_PORT", r->port, 1))
+        fprintf(stderr,"Can't setenv %s\n",strerror(errno));
+    if(setenv("REQUEST_METHOD", r->method,1))
+        fprintf(stderr,"Can't setenv %s\n",strerror(errno));
+    if(setenv("REQUEST_URI", r->uri, 1))
+        fprintf(stderr,"Can't setenv %s\n",strerror(errno));
+    if(setenv("SCRIPT_FILENAME", r->path,1))
+        fprintf(stderr,"Can't setenv %s\n",strerror(errno));
+    if(setenv("SERVER_PORT", Port, 1))
+        fprintf(stderr,"Can't setenv %s\n",strerror(errno));
     while (header!=NULL){
         if (streq(header->name,"Accept"))
             setenv("HTTP_ACCEPT", header->data,1);
@@ -225,7 +252,10 @@ Status  handle_cgi_request(Request *r) {
         header = header->next;
     }
     /* POpen CGI Script */
-    pfs = popen(r->path, "r");
+    if(r->path)
+        pfs = popen(r->path, "r");
+    else
+        pfs = popen(RootPath, "r");
     if(!pfs){
         pclose(pfs);
         return HTTP_STATUS_BAD_REQUEST;

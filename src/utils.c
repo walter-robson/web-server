@@ -39,7 +39,9 @@ char * determine_mimetype(const char *path) {
     FILE *fs = NULL;
 
     /* Find file extension */
-    ext = strrchr(path,'.');
+    ext=strrchr(path,'.');
+    if(!ext)
+        goto defaultmime;
     ext++;
     /* Open MimeTypesPath file */
     fs = fopen(MimeTypesPath,"r");
@@ -62,6 +64,9 @@ char * determine_mimetype(const char *path) {
     }
     debug("Hit DefaultMimeType");
     fclose(fs);
+    goto defaultmime;
+
+defaultmime:
     return DefaultMimeType;
 }
 
@@ -86,6 +91,9 @@ char * determine_request_path(const char *uri) {
     char buffer1[BUFSIZ];
     debug("This is the root path: %s",RootPath);
     debug("This is the uri: %s", uri);
+    if(uri==NULL){
+        return RootPath;
+    }
     snprintf(buffer1,BUFSIZ,"%s/%s/", RootPath, uri);
     char buffer2[BUFSIZ];
     //buffer is absolute path
@@ -93,7 +101,7 @@ char * determine_request_path(const char *uri) {
         debug("Real Path Error: %s", strerror(errno));
     }
     debug("This is the realpath: %s",buffer2);
-    if (strncmp(buffer2,RootPath,strlen(RootPath))==0){
+    if (strncmp(buffer2,RootPath,strlen(RootPath))!=0){
         debug("Strncmp result: %d", strncmp(buffer2,RootPath,strlen(RootPath)));
         return NULL;
     }
