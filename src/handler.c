@@ -36,26 +36,26 @@ Status  handle_request(Request *r) {
         result = handle_error(r, result);
         return result;
     }
-    
+
     r->path = determine_request_path(r->uri);
 
     // Determine request path
     debug("HTTP REQUEST PATH: %s", r->path);
 
-    // Dispatch to appropriate request handler type based on file type 
+    // Dispatch to appropriate request handler type based on file type
     struct stat s;
     stat(r->path, &s);
-    if (S_ISREG(s.st_mode)){
-        debug("Entered file request");
-        result = handle_file_request(r);
+    if ((access(r->path,X_OK) == 0) && S_ISREG(s.st_mode)){
+        debug("Entered cgi request");
+        result = handle_cgi_request(r);
     }
     else if (S_ISDIR(s.st_mode)){
         debug("Entered browse request");
         result = handle_browse_request(r);
     }
-    else if (access(r->path,X_OK)){
-        debug("Entered cgi request");
-        result = handle_cgi_request(r);
+    else if (S_ISREG(s.st_mode)){
+        debug("Entered file request");
+        result = handle_file_request(r);
     }
     else{
         result = handle_error(r, result);
@@ -99,8 +99,8 @@ Status  handle_browse_request(Request *r) {
         if (strcmp(entries[i]->d_name,".")==0){
             continue;
         }
-        fprintf(r->stream, "<li><a href=\"%s/%s\">%s</a></li>\n", r->uri, entries[i]->d_name, entries[i]->d_name); 
-        free(entries[i]);  
+        fprintf(r->stream, "<li><a href=\"%s/%s\">%s</a></li>\n", r->uri, entries[i]->d_name, entries[i]->d_name);
+        free(entries[i]);
     }
     free(entries);
     fprintf(r->stream, "<ul>\n");
@@ -124,7 +124,7 @@ Status  handle_file_request(Request *r) {
     FILE *fs;
     char buffer[BUFSIZ];
     char *mimetype = NULL;
-    size_t nread; 
+    size_t nread;
 
     /* Open file for reading */
     fs = fopen(r->path,"r");
@@ -174,19 +174,25 @@ fail:
  **/
 Status  handle_cgi_request(Request *r) {
     FILE *pfs;
-    char buffer[BUFSIZ]; 
+    char buffer[BUFSIZ];
+    debug("entered handle cgi request!!");
 
     /* Export CGI environment variables from request:
      * http://en.wikipedia.org/wiki/Common_Gateway_Interface */
 
     /* Export CGI environment variables from request headers */
-
+    setenv("QUERY_STRING", r->query, 1);
     /* POpen CGI Script */
-
+    pfs = popen(r->path, "r");
+    debug("opened the pfs");
     /* Copy data from popen to socket */
-
+    size_t nread = fread(buffer, 1, BUFSIZ, pfs);
+    while(nread>0){
+      fwrite(buffer, 1, nread, r->stream);
+      nread = fread(buffer, 1, BUFSIZ, pfs);
+    }
     /* Close popen, return OK */
-
+    pclose(pfs);
     return HTTP_STATUS_OK;
 }
 
@@ -207,7 +213,7 @@ Status  handle_error(Request *r, Status status) {
     fprintf(r->stream, "Content-Type: text/plain\r\n");
     fprintf(r->stream, "\r\n");
     /* Write HTML Description of Error*/
-    
+
 
     /* Return specified status */
     return status;

@@ -90,12 +90,12 @@ void free_request(Request *r) {
         fclose(r->stream);
     else
         close(r->fd);
-    
+
     /* Free allocated strings */
     free(r->method);
     free(r->uri);
     free(r->path);
-    free(r->query); 
+    free(r->query);
     /* Free headers */
     struct header *header;
     while(r->headers){
@@ -103,7 +103,7 @@ void free_request(Request *r) {
       r->headers = r->headers->next;
       free(header->name);
       free(header->data);
-      free(header); 
+      free(header);
     }
     /* Free request */
     free(r);
@@ -170,16 +170,26 @@ int parse_request_method(Request *r) {
       return HTTP_STATUS_BAD_REQUEST;
     }
     r->method = strdup(method);
-
+    char * newuri;
     /* Parse query from uri */
     char *temp = strchr(uri,'?');
     if (temp){
-        uri = strtok(skip_whitespace(++uri),temp);
-        query = strtok(NULL,temp);
-        r->uri = strdup(uri);
+        debug("enetered temp while parsing uri");
+        debug("temp: %s",temp);
+        if(strcmp(uri, "/")){
+
+          debug("increments uri");
+          uri++;
+          debug("URI: %s", uri);
+        }
+        newuri = strtok(uri,"?");
+        debug("New URI : %s",newuri);
+        query = ++temp;
+        r->uri = strdup(newuri);
         r->query = strdup(query);
     }
     else{
+      debug("did not enter temp while parsing uri");
         uri = skip_whitespace(++uri);
         if(!uri){
             goto fail;
@@ -251,7 +261,7 @@ int parse_request_headers(Request *r) {
         r->headers=curr;
     }
 
-    
+
 #ifndef NDEBUG
     for (Header *header = r->headers; header; header = header->next) {
     	debug("HTTP HEADER %s = %s", header->name, header->data);
