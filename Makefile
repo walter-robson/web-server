@@ -1,5 +1,5 @@
 CC=		gcc
-CFLAGS=		-g  -Wall -std=gnu99 -Iinclude  #took out -Wall
+CFLAGS=		-g  -Wall -Werror -std=gnu99 -Iinclude  #took out -Wall
 LD=		gcc
 LDFLAGS=	-L.
 AR=		ar
