@@ -39,30 +39,40 @@ char * determine_mimetype(const char *path) {
     FILE *fs = NULL;
 
     /* Find file extension */
+
     ext=strrchr(path,'.');
+
     if(!ext)
         goto defaultmime;
+
     ext++;
+
     /* Open MimeTypesPath file */
     fs = fopen(MimeTypesPath,"r");
+
     /* Scan file for matching file extensions */
     if (!fgets(buffer,BUFSIZ,fs)){
         return NULL;
     }
+
     while (fgets(buffer, BUFSIZ, fs)){
         mimetype = strtok(skip_whitespace(buffer),WHITESPACE);
+
         if (mimetype==NULL)
             continue;
+
         token = strtok(NULL,WHITESPACE);
+
         while(token){
             if (streq(token,ext)){
                 fclose(fs);
                 return strdup(mimetype);
             }
+
             token = strtok(NULL,WHITESPACE);
         }
     }
-    debug("Hit DefaultMimeType");
+
     fclose(fs);
     goto defaultmime;
 
@@ -87,25 +97,27 @@ defaultmime:
  * string must later be free'd.
  **/
 char * determine_request_path(const char *uri) {
-    log("entered request path");
     char buffer1[BUFSIZ];
-    debug("This is the root path: %s",RootPath);
-    debug("This is the uri: %s", uri);
+
     if(uri==NULL){
         return RootPath;
     }
+
     snprintf(buffer1,BUFSIZ,"%s/%s", RootPath, uri);
+
     char buffer2[BUFSIZ];
+
     //buffer is absolute path
     if(realpath(buffer1,buffer2)==NULL){
         debug("Real Path Error: %s", strerror(errno));
         return NULL;
     }
-    debug("This is the realpath: %s",buffer2);
+
     if (strncmp(buffer2,RootPath,strlen(RootPath))!=0){
         debug("Strncmp result: %d", strncmp(buffer2,RootPath,strlen(RootPath)));
         return NULL;
     }
+
     //allocate heap string
     return strdup(buffer2);
 }
@@ -129,7 +141,8 @@ const char * http_status_string(Status status) {
 
     if (status < sizeof(StatusStrings)/sizeof(char *)){
         return StatusStrings[status];
-    } else {
+    }
+    else{
         return NULL;
     }
 }
@@ -144,6 +157,7 @@ char * skip_nonwhitespace(char *s) {
     while (!isspace(*s)){
         s=s+1;
     }
+
     return s;
 }
 
@@ -157,6 +171,7 @@ char * skip_whitespace(char *s) {
     while (isspace(*s)){
         s=s+1;
     }
+    
     return s;
 }
 
