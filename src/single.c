@@ -31,6 +31,7 @@ int single_server(int sfd) {
       log("after handle request");
 	/* Free request */
       free_request(request);
+      log("after free request");
     }
 
     /* Close server socket */

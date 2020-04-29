@@ -99,7 +99,6 @@ void free_request(Request *r) {
         if(!streq(r->path,RootPath))
             free(r->path);
     }
-    free(r->path);
     free(r->query);
     /* Free headers */
     struct header *header;
