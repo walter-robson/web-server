@@ -94,15 +94,18 @@ int main(int argc, char *argv[]) {
     if (!parsed){
       fprintf(stderr, "unable to parse command line: %s\n", strerror(errno));
     }
+
     /* Listen to server socket */
     int server_fd = socket_listen(Port);
+
     if(server_fd < 0){
       perror("socket_listen");
       return EXIT_FAILURE;
     }
-    //  Request * r = accept_request(server_fd);
+
     /* Determine real RootPath */
     RootPath = realpath(RootPath,NULL);
+
     log("Listening on port %s", Port);
     debug("RootPath        = %s", RootPath);
     debug("MimeTypesPath   = %s", MimeTypesPath);
@@ -116,8 +119,7 @@ int main(int argc, char *argv[]) {
     else{
         single_server(server_fd);
     }
-  //    fprintf(stderr, "unable to start single server: %s\n", strerror(errno));
-  //  }
+  
     free(RootPath);
     return EXIT_SUCCESS;
 }
