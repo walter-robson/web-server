@@ -30,50 +30,47 @@ Status handle_error(Request *request, Status status);
 Status  handle_request(Request *r) {
     Status result;
     log("handle request");
+
     /* Parse request */
     if(parse_request(r)<0){
         debug("Unable to parse request: %s\n",strerror(errno));
         return handle_error(r,HTTP_STATUS_BAD_REQUEST);
     }
 
+    // Determine request path
     r->path = determine_request_path(r->uri);
-    if(r->path<0){
+    if(r->path < 0){
         debug("Could not determine request: %s\n",strerror(errno));
         return HTTP_STATUS_BAD_REQUEST;
     }
 
-    // Determine request path
     debug("HTTP REQUEST PATH: %s", r->path);
 
     // Dispatch to appropriate request handler type based on file type
     struct stat s;
-    debug("r->path before entering conditional: %s\n",r->path);
+
     if((r->path)==NULL){
-        debug("It passed the if");
         if(!stat(RootPath,&s)){
             result = handle_error(r,HTTP_STATUS_NOT_FOUND);
         }
     }
     else{
-        debug("It pass the else");
         if(!stat(r->path, &s)){
             result = HTTP_STATUS_BAD_REQUEST;
         }
     }
+
     if (S_ISDIR(s.st_mode)){
-        debug("Entered browse request");
         result = handle_browse_request(r);
         if (result)
             result = handle_error(r,result);
     }
     else if ((access(r->path,X_OK) == 0) && S_ISREG(s.st_mode)){
-        debug("Entered cgi request");
         result = handle_cgi_request(r);
         if (result)
             result = handle_error(r,result);
     }
     else if (S_ISREG(s.st_mode)){
-        debug("Entered file request");
         result = handle_file_request(r);
         if (result)
             result = handle_error(r,result);
@@ -81,9 +78,9 @@ Status  handle_request(Request *r) {
     else{
         result = HTTP_STATUS_BAD_REQUEST;
     }
+
     log("HTTP REQUEST STATUS: %s", http_status_string(result));
     return result;
-
 }
 
 /**
@@ -105,7 +102,7 @@ Status  handle_browse_request(Request *r) {
     if(r->uri==NULL){
         return HTTP_STATUS_BAD_REQUEST;
     }
-    debug("Entering browse request");
+
     if(r->path){
         n = scandir(r->path, &entries, 0, alphasort);
     }
@@ -124,21 +121,25 @@ Status  handle_browse_request(Request *r) {
 
     /* For each entry in directory, emit HTML list item */
     fprintf(r->stream, "<ul>\n");
+
     for (int i = 0; i < n; i++){
         if (strcmp(entries[i]->d_name,".")==0){
             free(entries[i]);
             continue;
         }
-        debug("URI during browse request: %s",r->uri);
+
         if (strcmp(r->uri,"")==0){
             fprintf(r->stream, "<li><a href=\"%s/%s\">%s</a></li>\n", "", entries[i]->d_name, entries[i]->d_name);
         }
         else{
             fprintf(r->stream, "<li><a href=\"/%s/%s\">%s</a></li>\n", r->uri, entries[i]->d_name, entries[i]->d_name);
         }
+
         free(entries[i]);
     }
+
     free(entries);
+
     fprintf(r->stream, "<ul>\n");
 
     /* Return OK */
@@ -168,26 +169,31 @@ Status  handle_file_request(Request *r) {
         goto fail;
     }
 
-    log("Get to mimetype");
     /* Determine mimetype */
     mimetype = determine_mimetype(r->path);
-    debug("This is the mimetype: %s\n", mimetype);
+
+    debug("Mimetype: %s\n", mimetype);
 
     /* Write HTTP Headers with OK status and determined Content-Type */
     fprintf(r->stream, "HTTP/1.0 200 OK\r\n");
     fprintf(r->stream, "Content-Type: %s\r\n",mimetype);
     fprintf(r->stream, "\r\n");
+
     /* Read from file and write to socket in chunks */
     nread = fread(buffer,1,BUFSIZ,fs);
+
     while (nread > 0){
         fwrite(buffer,1,nread,r->stream);
         nread = fread(buffer,1,BUFSIZ,fs);
     }
+
     /* Close file, deallocate mimetype, return OK */
     fclose(fs);
+
     if(mimetype!=DefaultMimeType){
         free(mimetype);
     }
+
     return HTTP_STATUS_OK;
 
 fail:
@@ -221,6 +227,7 @@ Status  handle_cgi_request(Request *r) {
     /* Export CGI environment variables from request headers */
     if(setenv("DOCUMENT_ROOT", RootPath,1))
         fprintf(stderr,"Can't setenv %s\n",strerror(errno));
+
     if(r->query){
         if(setenv("QUERY_STRING", r->query, 1))
             fprintf(stderr,"Can't setenv %s\n",strerror(errno));
@@ -254,22 +261,26 @@ Status  handle_cgi_request(Request *r) {
             setenv("HTTP_USER_AGENT", header->data, 1);
         header = header->next;
     }
+
     /* POpen CGI Script */
     if(r->path)
         pfs = popen(r->path, "r");
     else
         pfs = popen(RootPath, "r");
+
     if(!pfs){
         pclose(pfs);
         return HTTP_STATUS_BAD_REQUEST;
     }
-    debug("opened the pfs");
+
     /* Copy data from popen to socket */
     size_t nread = fread(buffer, 1, BUFSIZ, pfs);
+
     while(nread>0){
       fwrite(buffer, 1, nread, r->stream);
       nread = fread(buffer, 1, BUFSIZ, pfs);
     }
+
     /* Close popen, return OK */
     pclose(pfs);
     return HTTP_STATUS_OK;
@@ -291,6 +302,7 @@ Status  handle_error(Request *r, Status status) {
     fprintf(r->stream, "HTTP/1.0 %s\r\n",status_string);
     fprintf(r->stream, "Content-Type: text/html\r\n");
     fprintf(r->stream, "\r\n");
+    
     /* Write HTML Description of Error*/
     fprintf(r->stream,"<html><body>");
     fprintf(r->stream, "<h1>Error: %s</h1>\n",status_string);
