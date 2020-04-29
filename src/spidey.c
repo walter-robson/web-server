@@ -86,7 +86,7 @@ bool parse_options(int argc, char *argv[], ServerMode *mode) {
  * Parses command line options and starts appropriate server
  **/
 int main(int argc, char *argv[]) {
-    ServerMode mode;
+    ServerMode mode = SINGLE;
 
     /* Parse command line options */
     bool parsed = parse_options(argc, argv, &mode);
@@ -100,13 +100,14 @@ int main(int argc, char *argv[]) {
       perror("socket_listen");
       return EXIT_FAILURE;
     }
-  //  Request * r = accept_request(server_fd);
+    //  Request * r = accept_request(server_fd);
     /* Determine real RootPath */
+    RootPath = realpath(RootPath,NULL);
     log("Listening on port %s", Port);
     debug("RootPath        = %s", RootPath);
     debug("MimeTypesPath   = %s", MimeTypesPath);
     debug("DefaultMimeType = %s", DefaultMimeType);
-    debug("ConcurrencyMode = %s", mode == SINGLE ? "Single" : "Forking");
+    debug("ConcurrencyMode = %s", mode == FORKING ? "Forking" : "Single");
 
     /* Start either forking or single HTTP server */
     if (mode==FORKING){
@@ -117,6 +118,7 @@ int main(int argc, char *argv[]) {
     }
   //    fprintf(stderr, "unable to start single server: %s\n", strerror(errno));
   //  }
+    free(RootPath);
     return EXIT_SUCCESS;
 }
 

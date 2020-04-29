@@ -15,6 +15,7 @@
  **/
 int single_server(int sfd) {
     /* Accept and handle HTTP request */
+    Status result;
     while (true) {
     	/* Accept request */
       Request *request = accept_request(sfd);
@@ -26,8 +27,9 @@ int single_server(int sfd) {
 
 	/* Handle request */
       log("before handle request");
-      handle_request(request);
+      result = handle_request(request);
    //       fprintf(stderr,"Unable to handle request %s\n", strerror(errno));
+      debug("HTTP STATUS: %s\n",http_status_string(result));
       log("after handle request");
 	/* Free request */
       free_request(request);

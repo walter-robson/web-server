@@ -95,10 +95,11 @@ void free_request(Request *r) {
     free(r->method);
     free(r->uri);
     debug("r->path: %s\n", r->path);
-    if(r->path!=NULL){
+    free(r->path);
+/*    if(r->path!=NULL){
         if(!streq(r->path,RootPath))
             free(r->path);
-    }
+    } */
     free(r->query);
     /* Free headers */
     struct header *header;

@@ -99,6 +99,7 @@ char * determine_request_path(const char *uri) {
     //buffer is absolute path
     if(realpath(buffer1,buffer2)==NULL){
         debug("Real Path Error: %s", strerror(errno));
+        return NULL;
     }
     debug("This is the realpath: %s",buffer2);
     if (strncmp(buffer2,RootPath,strlen(RootPath))!=0){

@@ -33,7 +33,7 @@ Status  handle_request(Request *r) {
     /* Parse request */
     if(parse_request(r)<0){
         debug("Unable to parse request: %s\n",strerror(errno));
-        return HTTP_STATUS_BAD_REQUEST;
+        return handle_error(r,HTTP_STATUS_BAD_REQUEST);
     }
 
     r->path = determine_request_path(r->uri);
@@ -47,13 +47,15 @@ Status  handle_request(Request *r) {
 
     // Dispatch to appropriate request handler type based on file type
     struct stat s;
+    debug("r->path before entering conditional: %s\n",r->path);
     if((r->path)==NULL){
         debug("It passed the if");
-        if(!stat(r->path,&s)){
-            result = HTTP_STATUS_BAD_REQUEST;
+        if(!stat(RootPath,&s)){
+            result = handle_error(r,HTTP_STATUS_NOT_FOUND);
         }
     }
     else{
+        debug("It pass the else");
         if(!stat(r->path, &s)){
             result = HTTP_STATUS_BAD_REQUEST;
         }
@@ -80,8 +82,8 @@ Status  handle_request(Request *r) {
         result = HTTP_STATUS_BAD_REQUEST;
     }
     log("HTTP REQUEST STATUS: %s", http_status_string(result));
-
     return result;
+
 }
 
 /**
@@ -124,6 +126,7 @@ Status  handle_browse_request(Request *r) {
     fprintf(r->stream, "<ul>\n");
     for (int i = 0; i < n; i++){
         if (strcmp(entries[i]->d_name,".")==0){
+            free(entries[i]);
             continue;
         }
         debug("URI during browse request: %s",r->uri);
