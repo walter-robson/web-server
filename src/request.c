@@ -34,30 +34,36 @@ Request * accept_request(int sfd) {
 
     /* Allocate request struct (zeroed) */
     r = calloc(1, sizeof( Request));
+
     if(!r){
       debug("unable to allocate request: %s\n", strerror(errno));
       goto fail;
     }
+
     /* Accept a client */
     r->fd = accept(sfd, &raddr, &rlen);
+
     if(r->fd < 0){
       debug("unable to accept: %s\n", strerror(errno));
       goto fail;
     }
+
     /* Lookup client information */
     int status = getnameinfo(&raddr, rlen, r->host, sizeof(r->host),
         r->port, sizeof(r->port), NI_NUMERICHOST | NI_NUMERICSERV);
+
     if(status < 0){
       debug("unable to get name info: %s\n", gai_strerror(status));
       goto fail;
     }
+
     /* Open socket stream */
     r->stream = fdopen(r->fd, "w+");
+
     if(!r->stream){
       debug("unable to fdopen: %s\n", strerror(errno));
       goto fail;
     }
-
 
     log("Accepted request from %s:%s", r->host, r->port);
     return r;
@@ -96,13 +102,11 @@ void free_request(Request *r) {
     free(r->uri);
     debug("r->path: %s\n", r->path);
     free(r->path);
-/*    if(r->path!=NULL){
-        if(!streq(r->path,RootPath))
-            free(r->path);
-    } */
     free(r->query);
+
     /* Free headers */
     struct header *header;
+
     while(r->headers){
       header = r->headers;
       r->headers = r->headers->next;
@@ -110,6 +114,7 @@ void free_request(Request *r) {
       free(header->data);
       free(header);
     }
+
     /* Free request */
     free(r);
 }
@@ -129,12 +134,13 @@ int parse_request(Request *r) {
       fprintf(stderr, "unable to parse request method.\n");
       return -1;
     };
-    log("Parse methods succesfully");
+
     /* Parse HTTP Requet Headers*/
     if(parse_request_headers(r) < 0){
       fprintf(stderr, "unable to parse request headers.\n");
       return -1;
     }
+
     return 0;
 }
 
@@ -166,39 +172,44 @@ int parse_request_method(Request *r) {
       fprintf(stderr,"Bad request %s\n",strerror(errno));
       return HTTP_STATUS_BAD_REQUEST;
     }
+
     /* Parse method and uri */
     method = strtok(buffer, WHITESPACE);
+
     uri = strtok(NULL, WHITESPACE );
 
     if(!method || !uri){
       fprintf(stderr,"Bad request %s\n",strerror(errno));
       return HTTP_STATUS_BAD_REQUEST;
     }
+
     r->method = strdup(method);
+
     char * newuri;
+
     /* Parse query from uri */
     char *temp = strchr(uri,'?');
-    if (temp){
-        debug("enetered temp while parsing uri");
-        debug("temp: %s",temp);
-        if(strcmp(uri, "/")){
 
-          debug("increments uri");
-          uri++;
-          debug("URI: %s", uri);
+    if (temp){
+        if(strcmp(uri, "/")){
+          uri++;;
         }
+
         newuri = strtok(uri,"?");
-        debug("New URI : %s",newuri);
+
         query = ++temp;
+
         r->uri = strdup(newuri);
+
         r->query = strdup(query);
     }
     else{
-      debug("did not enter temp while parsing uri");
         uri = skip_whitespace(++uri);
+
         if(!uri){
             goto fail;
         }
+
         r->uri = strdup(uri);
     }
 
@@ -244,25 +255,34 @@ int parse_request_headers(Request *r) {
     Header *curr = NULL;
     char buffer[BUFSIZ];
     char *name;
+
     /* Parse headers from socket */
     while(fgets(buffer, BUFSIZ, r->stream) && (strlen(buffer) > 2)){
         chomp(buffer);
+
         char*temp = strchr(skip_whitespace(buffer),':');
+
         //occasionally hits NDEBUG and goes on forever
         if(!temp){
-            debug("No temp\n");
             goto fail;
         }
+
         *temp=0;
+
         curr = calloc(1,sizeof(Header));
+
         curr->data = strdup(skip_whitespace(++temp));
+
         name = skip_whitespace(buffer);
+
         if(!name){
-            debug("No name\n");
             goto fail;
         }
+
         curr->name = strdup(name);
+
         curr->next=r->headers;
+        
         r->headers=curr;
     }
 
