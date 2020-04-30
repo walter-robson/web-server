@@ -1,0 +1,230 @@
+Single Server Throughput Results
+
+
+Trial 1: Kilobyte
+
+Hammer: 2, Throw: 0, Elapsed Time: 1.0967516899108887
+Hammer: 2, Throw: 1, Elapsed Time: 0.8155536651611328
+Hammer: 2, Throw: 2, Elapsed Time: 0.6350994110107422
+Hammer: 2, Throw: 3, Elapsed Time: 0.6033916473388672
+Hammer: 2, Throw: 4, Elapsed Time: 0.5824553966522217
+Hammer: 2, Throw: 5, Elapsed Time: 0.5859513282775879
+Hammer: 2, Throw: 6, Elapsed Time: 0.6249222755432129
+Hammer: 2, Throw: 7, Elapsed Time: 0.5959365367889404
+Hammer: 2, Throw: 8, Elapsed Time: 0.5672228336334229
+Hammer: 2, Throw: 9, Elapsed Time: 0.5716447830200195
+Hammer: 2, AVERAGE , Elapsed Time: 0.6678929567337036
+Hammer: 0, Throw: 0, Elapsed Time: 0.721785306930542
+Hammer: 0, Throw: 1, Elapsed Time: 0.6111996173858643
+Hammer: 0, Throw: 2, Elapsed Time: 0.8320105075836182
+Hammer: 0, Throw: 3, Elapsed Time: 0.581780195236206
+Hammer: 0, Throw: 4, Elapsed Time: 0.5951004028320312
+Hammer: 0, Throw: 5, Elapsed Time: 0.5884547233581543
+Hammer: 0, Throw: 6, Elapsed Time: 0.5956876277923584
+Hammer: 0, Throw: 7, Elapsed Time: 0.6171386241912842
+Hammer: 0, Throw: 8, Elapsed Time: 0.5927717685699463
+Hammer: 0, Throw: 9, Elapsed Time: 0.5627298355102539
+Hammer: 0, AVERAGE , Elapsed Time: 0.6298658609390259
+Hammer: 1, Throw: 0, Elapsed Time: 0.9170243740081787
+Hammer: 1, Throw: 1, Elapsed Time: 0.6048481464385986
+Hammer: 1, Throw: 2, Elapsed Time: 0.8374006748199463
+Hammer: 1, Throw: 3, Elapsed Time: 0.5889487266540527
+Hammer: 1, Throw: 4, Elapsed Time: 0.5880832672119141
+Hammer: 1, Throw: 5, Elapsed Time: 0.5886516571044922
+Hammer: 1, Throw: 6, Elapsed Time: 0.6340885162353516
+Hammer: 1, Throw: 7, Elapsed Time: 0.5965580940246582
+Hammer: 1, Throw: 8, Elapsed Time: 0.5715973377227783
+Hammer: 1, Throw: 9, Elapsed Time: 0.5640299320220947
+Hammer: 1, AVERAGE , Elapsed Time: 0.6491230726242065
+TOTAL AVERAGE ELAPSED TIME: 0.6489606300989786
+
+
+Trial 2: Megabyte
+
+Hammer: 0, Throw: 0, Elapsed Time: 0.3843858242034912
+Hammer: 0, Throw: 1, Elapsed Time: 0.6059813499450684
+Hammer: 0, Throw: 2, Elapsed Time: 0.5902740955352783
+Hammer: 0, Throw: 3, Elapsed Time: 0.6007492542266846
+Hammer: 0, Throw: 4, Elapsed Time: 0.5936381816864014
+Hammer: 0, Throw: 5, Elapsed Time: 0.605480432510376
+Hammer: 0, Throw: 6, Elapsed Time: 0.6208899021148682
+Hammer: 0, Throw: 7, Elapsed Time: 0.6254277229309082
+Hammer: 0, Throw: 8, Elapsed Time: 0.6178622245788574
+Hammer: 0, Throw: 9, Elapsed Time: 0.6092000007629395
+Hammer: 0, AVERAGE , Elapsed Time: 0.5853888988494873
+Hammer: 2, Throw: 0, Elapsed Time: 0.790569543838501
+Hammer: 2, Throw: 1, Elapsed Time: 0.5946054458618164
+Hammer: 2, Throw: 2, Elapsed Time: 0.5982866287231445
+Hammer: 2, Throw: 3, Elapsed Time: 0.594862699508667
+Hammer: 2, Throw: 4, Elapsed Time: 0.599445104598999
+Hammer: 2, Throw: 5, Elapsed Time: 0.6201233863830566
+Hammer: 2, Throw: 6, Elapsed Time: 0.6256346702575684
+Hammer: 2, Throw: 7, Elapsed Time: 0.615966796875
+Hammer: 2, Throw: 8, Elapsed Time: 0.6071248054504395
+Hammer: 2, Throw: 9, Elapsed Time: 0.6153810024261475
+Hammer: 2, AVERAGE , Elapsed Time: 0.626200008392334
+Hammer: 1, Throw: 0, Elapsed Time: 0.5936496257781982
+Hammer: 1, Throw: 1, Elapsed Time: 0.596426248550415
+Hammer: 1, Throw: 2, Elapsed Time: 0.5943276882171631
+Hammer: 1, Throw: 3, Elapsed Time: 0.5922677516937256
+Hammer: 1, Throw: 4, Elapsed Time: 0.599428653717041
+Hammer: 1, Throw: 5, Elapsed Time: 0.6103920936584473
+Hammer: 1, Throw: 6, Elapsed Time: 0.6274442672729492
+Hammer: 1, Throw: 7, Elapsed Time: 0.6141412258148193
+Hammer: 1, Throw: 8, Elapsed Time: 0.6196632385253906
+Hammer: 1, Throw: 9, Elapsed Time: 0.6159317493438721
+Hammer: 1, AVERAGE , Elapsed Time: 0.6063672542572022
+TOTAL AVERAGE ELAPSED TIME: 0.6059853871663411
+
+
+Trial 3: Gigabyte
+
+Hammer: 2, Throw: 0, Elapsed Time: 18.24827241897583
+Hammer: 2, Throw: 1, Elapsed Time: 52.21416425704956
+Hammer: 2, Throw: 2, Elapsed Time: 33.098496198654175
+Hammer: 2, Throw: 3, Elapsed Time: 31.074405193328857
+Hammer: 2, Throw: 4, Elapsed Time: 33.87234020233154
+Hammer: 2, Throw: 5, Elapsed Time: 32.097585916519165
+Hammer: 2, Throw: 6, Elapsed Time: 32.85758852958679
+Hammer: 2, Throw: 7, Elapsed Time: 30.434725999832153
+Hammer: 2, Throw: 8, Elapsed Time: 31.996530771255493
+Hammer: 2, Throw: 9, Elapsed Time: 30.519996166229248
+Hammer: 2, AVERAGE , Elapsed Time: 32.64141056537628
+Hammer: 1, Throw: 0, Elapsed Time: 60.450435400009155
+Hammer: 1, Throw: 1, Elapsed Time: 32.62595295906067
+Hammer: 1, Throw: 2, Elapsed Time: 31.677412033081055
+Hammer: 1, Throw: 3, Elapsed Time: 31.776503801345825
+Hammer: 1, Throw: 4, Elapsed Time: 33.38003754615784
+Hammer: 1, Throw: 5, Elapsed Time: 32.1610164642334
+Hammer: 1, Throw: 6, Elapsed Time: 31.318939447402954
+Hammer: 1, Throw: 7, Elapsed Time: 31.334944486618042
+Hammer: 1, Throw: 8, Elapsed Time: 31.736191749572754
+Hammer: 1, Throw: 9, Elapsed Time: 29.589380502700806
+Hammer: 1, AVERAGE , Elapsed Time: 34.60508143901825
+Hammer: 0, Throw: 0, Elapsed Time: 50.22562384605408
+Hammer: 0, Throw: 1, Elapsed Time: 31.01163125038147
+Hammer: 0, Throw: 2, Elapsed Time: 33.80661678314209
+Hammer: 0, Throw: 3, Elapsed Time: 30.837908267974854
+Hammer: 0, Throw: 4, Elapsed Time: 33.981342792510986
+Hammer: 0, Throw: 5, Elapsed Time: 31.462890148162842
+Hammer: 0, Throw: 6, Elapsed Time: 31.844696760177612
+Hammer: 0, Throw: 7, Elapsed Time: 31.35014581680298
+Hammer: 0, Throw: 8, Elapsed Time: 31.62716794013977
+Hammer: 0, Throw: 9, Elapsed Time: 30.111876010894775
+Hammer: 0, AVERAGE , Elapsed Time: 33.62598996162414
+TOTAL AVERAGE ELAPSED TIME: 33.62416065533956
+Forking Server Throughput Results
+
+
+Trial 1: Kilobyte
+
+Hammer: 0, Throw: 0, Elapsed Time: 0.5735611915588379
+Hammer: 0, Throw: 1, Elapsed Time: 0.21021008491516113
+Hammer: 0, Throw: 2, Elapsed Time: 0.20552945137023926
+Hammer: 0, Throw: 3, Elapsed Time: 0.22954797744750977
+Hammer: 0, Throw: 4, Elapsed Time: 0.21018767356872559
+Hammer: 0, Throw: 5, Elapsed Time: 0.2189924716949463
+Hammer: 0, Throw: 6, Elapsed Time: 0.2228858470916748
+Hammer: 0, Throw: 7, Elapsed Time: 0.23488688468933105
+Hammer: 0, Throw: 8, Elapsed Time: 0.21508479118347168
+Hammer: 0, Throw: 9, Elapsed Time: 0.2139294147491455
+Hammer: 0, AVERAGE , Elapsed Time: 0.2534815788269043
+Hammer: 2, Throw: 0, Elapsed Time: 0.5754845142364502
+Hammer: 2, Throw: 1, Elapsed Time: 0.2126162052154541
+Hammer: 2, Throw: 2, Elapsed Time: 0.19966888427734375
+Hammer: 2, Throw: 3, Elapsed Time: 0.22280144691467285
+Hammer: 2, Throw: 4, Elapsed Time: 0.21919608116149902
+Hammer: 2, Throw: 5, Elapsed Time: 0.22154927253723145
+Hammer: 2, Throw: 6, Elapsed Time: 0.21877479553222656
+Hammer: 2, Throw: 7, Elapsed Time: 0.23463749885559082
+Hammer: 2, Throw: 8, Elapsed Time: 0.2158794403076172
+Hammer: 2, Throw: 9, Elapsed Time: 0.21424579620361328
+Hammer: 2, AVERAGE , Elapsed Time: 0.25348539352416993
+Hammer: 1, Throw: 0, Elapsed Time: 0.5790479183197021
+Hammer: 1, Throw: 1, Elapsed Time: 0.20870494842529297
+Hammer: 1, Throw: 2, Elapsed Time: 0.20032739639282227
+Hammer: 1, Throw: 3, Elapsed Time: 0.23138833045959473
+Hammer: 1, Throw: 4, Elapsed Time: 0.20943212509155273
+Hammer: 1, Throw: 5, Elapsed Time: 0.21860218048095703
+Hammer: 1, Throw: 6, Elapsed Time: 0.22289395332336426
+Hammer: 1, Throw: 7, Elapsed Time: 0.2211451530456543
+Hammer: 1, Throw: 8, Elapsed Time: 0.2298269271850586
+Hammer: 1, Throw: 9, Elapsed Time: 0.2162768840789795
+Hammer: 1, AVERAGE , Elapsed Time: 0.25376458168029786
+TOTAL AVERAGE ELAPSED TIME: 0.25357718467712403
+
+
+Trial 2: Megabyte
+
+Hammer: 1, Throw: 0, Elapsed Time: 0.37177586555480957
+Hammer: 1, Throw: 1, Elapsed Time: 0.22754120826721191
+Hammer: 1, Throw: 2, Elapsed Time: 0.23458552360534668
+Hammer: 1, Throw: 3, Elapsed Time: 0.25472092628479004
+Hammer: 1, Throw: 4, Elapsed Time: 0.23876333236694336
+Hammer: 1, Throw: 5, Elapsed Time: 0.23139190673828125
+Hammer: 1, Throw: 6, Elapsed Time: 0.23830747604370117
+Hammer: 1, Throw: 7, Elapsed Time: 0.2266242504119873
+Hammer: 1, Throw: 8, Elapsed Time: 0.2238004207611084
+Hammer: 1, Throw: 9, Elapsed Time: 0.23256278038024902
+Hammer: 1, AVERAGE , Elapsed Time: 0.24800736904144288
+Hammer: 0, Throw: 0, Elapsed Time: 0.36683034896850586
+Hammer: 0, Throw: 1, Elapsed Time: 0.23347711563110352
+Hammer: 0, Throw: 2, Elapsed Time: 0.23369073867797852
+Hammer: 0, Throw: 3, Elapsed Time: 0.255202054977417
+Hammer: 0, Throw: 4, Elapsed Time: 0.2335515022277832
+Hammer: 0, Throw: 5, Elapsed Time: 0.23875808715820312
+Hammer: 0, Throw: 6, Elapsed Time: 0.24158787727355957
+Hammer: 0, Throw: 7, Elapsed Time: 0.22045040130615234
+Hammer: 0, Throw: 8, Elapsed Time: 0.2300877571105957
+Hammer: 0, Throw: 9, Elapsed Time: 0.22709894180297852
+Hammer: 0, AVERAGE , Elapsed Time: 0.24807348251342773
+Hammer: 2, Throw: 0, Elapsed Time: 0.37531590461730957
+Hammer: 2, Throw: 1, Elapsed Time: 0.22562527656555176
+Hammer: 2, Throw: 2, Elapsed Time: 0.2375643253326416
+Hammer: 2, Throw: 3, Elapsed Time: 0.23076486587524414
+Hammer: 2, Throw: 4, Elapsed Time: 0.2526566982269287
+Hammer: 2, Throw: 5, Elapsed Time: 0.23624539375305176
+Hammer: 2, Throw: 6, Elapsed Time: 0.24582576751708984
+Hammer: 2, Throw: 7, Elapsed Time: 0.2187671661376953
+Hammer: 2, Throw: 8, Elapsed Time: 0.2242882251739502
+Hammer: 2, Throw: 9, Elapsed Time: 0.23334789276123047
+Hammer: 2, AVERAGE , Elapsed Time: 0.24804015159606935
+TOTAL AVERAGE ELAPSED TIME: 0.24804033438364667
+
+
+Trial 3: Gigabyte
+
+Hammer: 1, Throw: 0, Elapsed Time: 13.473026752471924
+Hammer: 1, Throw: 1, Elapsed Time: 13.200626134872437
+Hammer: 1, Throw: 2, Elapsed Time: 13.623703479766846
+Hammer: 1, Throw: 3, Elapsed Time: 12.04545259475708
+Hammer: 1, Throw: 4, Elapsed Time: 14.88638687133789
+Hammer: 1, Throw: 5, Elapsed Time: 13.145861148834229
+Hammer: 1, Throw: 6, Elapsed Time: 13.727867603302002
+Hammer: 1, Throw: 7, Elapsed Time: 12.98466181755066
+Hammer: 1, Throw: 8, Elapsed Time: 12.737387657165527
+Hammer: 1, Throw: 9, Elapsed Time: 12.884456872940063
+Hammer: 1, AVERAGE , Elapsed Time: 13.270943093299866
+Hammer: 0, Throw: 0, Elapsed Time: 13.169729709625244
+Hammer: 0, Throw: 1, Elapsed Time: 13.343264818191528
+Hammer: 0, Throw: 2, Elapsed Time: 13.412495136260986
+Hammer: 0, Throw: 3, Elapsed Time: 13.130164861679077
+Hammer: 0, Throw: 4, Elapsed Time: 14.137125015258789
+Hammer: 0, Throw: 5, Elapsed Time: 14.3037428855896
+Hammer: 0, Throw: 6, Elapsed Time: 13.518074989318848
+Hammer: 0, Throw: 7, Elapsed Time: 13.018943786621094
+Hammer: 0, Throw: 8, Elapsed Time: 12.980311393737793
+Hammer: 0, Throw: 9, Elapsed Time: 11.609485387802124
+Hammer: 0, AVERAGE , Elapsed Time: 13.262333798408509
+Hammer: 2, Throw: 0, Elapsed Time: 12.184311866760254
+Hammer: 2, Throw: 1, Elapsed Time: 13.111127853393555
+Hammer: 2, Throw: 2, Elapsed Time: 12.214904308319092
+Hammer: 2, Throw: 3, Elapsed Time: 12.212098360061646
+Hammer: 2, Throw: 4, Elapsed Time: 13.185968160629272
+Hammer: 2, Throw: 5, Elapsed Time: 12.678544282913208
+Hammer: 2, Throw: 6, Elapsed Time: 12.906438827514648
+Hammer: 2, Throw: 7, Elapsed Time: 13.883689403533936
+Hammer: 2, Throw: 8, Elapsed Time: 13.595319747924805
+Hammer: 2, Throw: 9, Elapsed Time: 13.298827409744263
+Hammer: 2, AVERAGE , Elapsed Time: 12.927123022079467
+TOTAL AVERAGE ELAPSED TIME: 13.153466637929279

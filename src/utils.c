@@ -100,10 +100,12 @@ char * determine_request_path(const char *uri) {
     char buffer1[BUFSIZ];
 
     if(uri==NULL){
+
         return RootPath;
     }
 
-    snprintf(buffer1,BUFSIZ,"%s/%s", RootPath, uri);
+    if(snprintf(buffer1,BUFSIZ,"%s/%s", RootPath, uri)<0)
+        return NULL;
 
     char buffer2[BUFSIZ];
 

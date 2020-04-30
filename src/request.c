@@ -101,7 +101,8 @@ void free_request(Request *r) {
     free(r->method);
     free(r->uri);
     debug("r->path: %s\n", r->path);
-    free(r->path);
+    if(r->path!=RootPath)
+        free(r->path);
     free(r->query);
 
     /* Free headers */

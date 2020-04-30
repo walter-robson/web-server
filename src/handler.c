@@ -38,6 +38,7 @@ Status  handle_request(Request *r) {
     }
 
     // Determine request path
+    debug("Entering determine request path");
     r->path = determine_request_path(r->uri);
     if(r->path < 0){
         debug("Could not determine request: %s\n",strerror(errno));
