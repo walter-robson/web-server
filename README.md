@@ -2,7 +2,7 @@
 
 This is the [Final Project] for [CSE 20289 Systems Programming (Spring 2020)].
 
-A webserver in C as well as a web client (thor.py).  The server is forking and can handle multiple requests.  The client can repeatedly hammer a client with requests. 
+A webserver in C as well as a web client (thor.py).  The server is forking and can handle multiple requests.  The client can repeatedly hammer a server with requests. 
 
 ## Demonstration
 
